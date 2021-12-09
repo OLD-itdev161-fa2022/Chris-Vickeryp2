@@ -40,7 +40,8 @@ class App extends React.Component {
       <Router>
         <div className="App">
           <header className="App-header">
-            <h1>GoodThings</h1>
+            <h1>Role Play Connect</h1>
+            <p>A FFXIV roleplay site</p>
             <ul>
               <li>
                 <Link to="/">Home</Link>
