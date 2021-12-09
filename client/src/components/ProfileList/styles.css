@@ -1,0 +1,22 @@
+.profileListItem {
+  padding: 10px;
+  border: solid 1px transparent;
+}
+.profileListItem:hover {
+  background-color: #eee;
+  border-color: #aaa;
+  cursor: pointer;
+}
+.profileListItem p {
+  max-width: 500px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.profileControls {
+  margin: 10px 0 10px 0;
+}
+
+.profile button {
+  margin-left: 10px;
+}

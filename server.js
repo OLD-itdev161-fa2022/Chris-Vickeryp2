@@ -221,6 +221,28 @@ app.get("/api/profiles", auth, async (req, res) => {
 });
 
 /**
+ * @route get/profiles/:id
+ * @desc get post by id
+ */
+
+app.get("/api/profiles/:id", auth, async (req, res) => {
+  try {
+    let thing;
+    const profile = await Profile.findById(req.params.id);
+
+    // see if the post was really found
+    if (!profile) {
+      return res.status(404).json({ msg: "post not found" });
+      thing = "no post";
+    }
+    res.json(profile);
+  } catch (error) {
+    console.error(error);
+    res.status(500).send("Server error" + "   " + thing);
+  }
+});
+
+/**
  * @route delete api/profiles/:id
  * @desc delete a profile
  */
