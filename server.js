@@ -6,6 +6,7 @@ import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import config from "config";
 import User from "./models/User";
+import Profile from "./models/Profile";
 import auth from "./middleware/auth";
 
 // Initialize express application
@@ -141,6 +142,110 @@ app.post(
     }
   }
 );
+/**
+ *
+ * @route Post api/profile
+ * @desc create a profile
+ */
+
+app.post(
+  "/api/profile",
+  auth,
+  [
+    check("characterName", "a name is required").not().isEmpty(),
+    check(
+      "characterLevel",
+      "the level of your character is requried for matching reasons"
+    )
+      .not()
+      .isEmpty(),
+    check("server", "Your server is required for matching reasons")
+      .not()
+      .isEmpty(),
+    check("playerClass", "You must list your class").not().isEmpty(),
+    check(
+      "bio",
+      "If you do not enter a small biogorphay how will your roleplay partner know anything about you?"
+    )
+      .not()
+      .isEmpty(),
+  ],
+  async (req, res) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      res.status(400).json({ errors: errors.array() });
+    } else {
+      let thing;
+      const { characterName, characterLevel, playerClass, bio, server } =
+        req.body;
+
+      try {
+        const user = await User.findById(req.user.id);
+
+        // make the profile
+        thing = "gothere";
+        const profile = new Profile({
+          user: user.id,
+          characterName: characterName,
+          characterLevel: characterLevel,
+          playerClass: playerClass,
+          bio: bio,
+          server: server,
+        });
+        thing = "gothere2";
+        //save to the db return data
+        await profile.save();
+        thing = "gothere3";
+        res.json(profile);
+      } catch (error) {
+        console.log(error);
+        res.status(500).send("server error" + thing);
+      }
+    }
+  }
+);
+
+/**
+ * @route get api/profiles
+ * @desc get profiles
+ */
+
+app.get("/api/profiles", auth, async (req, res) => {
+  try {
+    const profiles = await Profile.find().sort({});
+    res.json(profiles);
+  } catch (error) {
+    console.error(error);
+    res.status(500).send("server error");
+  }
+});
+
+/**
+ * @route delete api/profiles/:id
+ * @desc delete a profile
+ */
+
+app.delete("/api/profiles/:id", auth, async (req, res) => {
+  try {
+    const profile = await Profile.findById(req.params.id);
+
+    if (!profile) {
+      return res.status(404).json({ msg: "profile not found" });
+    }
+
+    // chekc fi the user made the profile
+
+    if (profile.user.toString() !== req.user.id) {
+      return res.status(401).json({ msg: "User not authorized" });
+    }
+
+    await profile.remove();
+    res.json({ msg: "post removed" });
+  } catch (error) {
+    console.error(error);
+    res.status(500).send("server error");
+  }
+});
 
 // return token method
 
